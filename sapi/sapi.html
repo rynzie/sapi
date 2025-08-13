@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deteksi Jenis Kelamin Sapi</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style></style>
+  </head>
+  <body>
+    <a class="back-button" href="../landing.html">← Kembali</a>
+    <div class="container">
+      <h2>Deteksi Jenis Kelamin Sapi</h2>
+
+      <input type="file" id="imageUpload" accept="image/*" />
+      <button id="webcamButton">Try with Webcam</button>
+      <button id="exitWebcamButton" style="display: none">Exit Camera</button>
+
+      <div id="preview-container">
+        <video id="webcam" autoplay playsinline style="display: none"></video>
+        <img id="preview" src="" alt="Preview Gambar" />
+      </div>
+
+      <button id="detectButton">Identifikasi</button>
+      <div id="result"></div>
+    </div>
+
+    <script src="func.js"></script>
+  </body>
+</html>
