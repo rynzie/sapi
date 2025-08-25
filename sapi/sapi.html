@@ -3,28 +3,89 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Deteksi Jenis Kelamin Sapi</title>
+    <title>Deteksi</title>
     <link rel="stylesheet" href="../css/style.css" />
-    <style></style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
   </head>
   <body>
-    <a class="back-button" href="../landing.html">← Kembali</a>
-    <div class="container">
-      <h2>Deteksi Jenis Kelamin Sapi</h2>
-
-      <input type="file" id="imageUpload" accept="image/*" />
-      <button id="webcamButton">Try with Webcam</button>
-      <button id="exitWebcamButton" style="display: none">Exit Camera</button>
-
-      <div id="preview-container">
-        <video id="webcam" autoplay playsinline style="display: none"></video>
-        <img id="preview" src="" alt="Preview Gambar" />
+    <nav class="navbar navbar-expand-lg navbar-light bg-light w-100 sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Deteksi</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link active" href="../landing.html">Home</a></li>
+            <!-- <li class="nav-item"><a class="nav-link" href="#">Features</a></li> -->
+            <!-- <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li> -->
+          </ul>
+        </div>
       </div>
+    </nav>
 
-      <button id="detectButton">Identifikasi</button>
-      <div id="result"></div>
-    </div>
+    <main>
+      <div class="container">
+        <h2>Deteksi</h2>
+        <input type="file" id="imageUpload" accept="image/*" />
+        <button id="webcamButton">Try with Webcam</button>
+        <button id="exitWebcamButton" style="display: none">Exit Camera</button>
+
+        <div id="preview-container">
+          <video id="webcam" autoplay playsinline style="display: none"></video>
+          <img id="preview" src="" alt="Preview Gambar" />
+        </div>
+        <button id="captureButton" style="display: none">Ambil Foto</button>
+        <button id="detectButton">Identifikasi</button>
+
+        <div id="result"></div>
+        <div id="loader" style="display: none; text-align: center; margin-top: 10px">
+          <div class="spinner"></div>
+          <p>Sedang mendeteksi...</p>
+        </div>
+
+        <button id="printButton" class="btn btn-success mt-3" style="display: none">🖨️ Cetak Hasil</button>
+
+        <div class="modal fade" id="printModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Form Cetak Hasil Deteksi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div id="printArea" class="container">
+                  <div class="row">
+                    <div class="col-md-6 text-center">
+                      <img id="printImage" src="" class="img-fluid rounded shadow" />
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card shadow">
+                        <div class="card-body">
+                          <h5 class="card-title">Detail Deteksi</h5>
+                          <p id="printDetail"></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button id="downloadPDF" class="btn btn-primary">Download PDF</button>
+                <button id="downloadIMG" class="btn btn-warning">Download Gambar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
 
     <script src="../func.js"></script>
+    <script src="../down.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   </body>
 </html>

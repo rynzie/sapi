@@ -13,12 +13,12 @@ header {
   color: white;
 }
 
-header h1 {
+.pan {
   margin: 0;
   font-size: 2em;
 }
 
-.container {
+.containerr {
   max-width: 800px;
   margin: 40px auto;
   padding: 20px;
@@ -41,7 +41,7 @@ header h1 {
   border-bottom: none;
 }
 
-.btn {
+.c-btn {
   display: inline-block;
   margin-top: 20px;
   padding: 12px 20px;
