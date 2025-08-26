@@ -7,10 +7,7 @@ const preview = document.getElementById("preview")
 const result = document.getElementById("result")
 const detectButton = document.getElementById("detectButton")
 const loader = document.getElementById("loader")
-
 const printButton = document.getElementById("printButton")
-const printImage = document.getElementById("printImage")
-const printDetail = document.getElementById("printDetail")
 
 let base64Image = ""
 let webcamStream = null
@@ -22,7 +19,6 @@ let allowDetection = true
 imageInput.addEventListener("change", function () {
   const file = this.files[0]
   resetHasil()
-
   if (file) {
     const reader = new FileReader()
     reader.onload = function (e) {
@@ -39,14 +35,15 @@ webcamButton.addEventListener("click", async function () {
   resetHasil()
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" },
+      video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
     })
     webcamStream = stream
     webcam.srcObject = stream
 
+    await webcam.play()
+
     webcam.style.display = "block"
     preview.style.display = "none"
-
     webcamButton.style.display = "none"
     exitWebcamButton.style.display = "inline-block"
     captureButton.style.display = "inline-block"
@@ -55,6 +52,7 @@ webcamButton.addEventListener("click", async function () {
     isLive = true
     allowDetection = true
     firstLiveDetection = true
+
     detectionInterval = setInterval(() => {
       ambilFrameDariKamera()
     }, 1000)
@@ -77,18 +75,16 @@ function ambilFrameDariKamera() {
   kirimKeRoboflow(true)
 }
 
-captureButton.addEventListener("click", function () {
+captureButton.addEventListener("click", async function () {
   if (!webcam.videoWidth || !webcam.videoHeight) return
-
   if (detectionInterval) {
     clearInterval(detectionInterval)
     detectionInterval = null
   }
-  stopWebcam()
 
-  isLive = false
-  allowDetection = false
-  resetHasil()
+  if (webcam.readyState < 2) {
+    await new Promise((resolve) => setTimeout(resolve, 200))
+  }
 
   const canvas = document.createElement("canvas")
   canvas.width = webcam.videoWidth
@@ -100,6 +96,12 @@ captureButton.addEventListener("click", function () {
   preview.src = canvas.toDataURL("image/jpeg")
   preview.style.display = "block"
   webcam.style.display = "none"
+
+  stopWebcam()
+
+  isLive = false
+  allowDetection = false
+  resetHasil()
 
   captureButton.style.display = "none"
   detectButton.style.display = "inline-block"
@@ -142,29 +144,6 @@ function resetHasil() {
   printButton.style.display = "none"
 }
 
-printButton.addEventListener("click", function () {
-  const modal = new bootstrap.Modal(document.getElementById("printModal"))
-  modal.show()
-})
-
-function tampilkanHasil(className, confidence) {
-  result.innerHTML = `
-    Jenis kelamin: <strong>${className.toUpperCase()}</strong><br>
-    Akurasi: ${confidence}%`
-
-  if (!isLive) {
-    printButton.style.display = "inline-block"
-    printImage.src = preview.src || webcam.src
-    printDetail.innerHTML = `
-      <strong>Jenis kelamin:</strong> ${className.toUpperCase()}<br>
-      <strong>Akurasi:</strong> ${confidence}%<br>
-      <strong>Tanggal:</strong> ${new Date().toLocaleString()}
-    `
-  } else {
-    printButton.style.display = "none"
-  }
-}
-
 function kirimKeRoboflow(fromLive = false) {
   if (!base64Image) return
   if (!allowDetection && fromLive) return
@@ -187,7 +166,6 @@ function kirimKeRoboflow(fromLive = false) {
         const prediction = data.predictions[0]
         const className = prediction.class
         const confidence = (prediction.confidence * 100).toFixed(2)
-
         tampilkanHasil(className, confidence)
       } else {
         result.innerHTML = "Tidak dapat mengenali jenis kelamin sapi."
@@ -205,6 +183,16 @@ function kirimKeRoboflow(fromLive = false) {
         firstLiveDetection = false
       }
     })
+}
+
+function tampilkanHasil(className, confidence) {
+  result.innerHTML = `Jenis kelamin: <strong>${className.toUpperCase()}</strong><br>
+                      Akurasi: ${confidence}%`
+  if (!isLive) {
+    printButton.style.display = "inline-block"
+  } else {
+    printButton.style.display = "none"
+  }
 }
 
 detectButton.addEventListener("click", function () {
