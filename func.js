@@ -39,7 +39,6 @@ webcamButton.addEventListener("click", async function () {
     })
     webcamStream = stream
     webcam.srcObject = stream
-
     await webcam.play()
 
     webcam.style.display = "block"
@@ -64,13 +63,11 @@ webcamButton.addEventListener("click", async function () {
 
 function ambilFrameDariKamera() {
   if (!webcam.videoWidth || !webcam.videoHeight) return
-
   const canvas = document.createElement("canvas")
   canvas.width = webcam.videoWidth
   canvas.height = webcam.videoHeight
   const ctx = canvas.getContext("2d")
   ctx.drawImage(webcam, 0, 0)
-
   base64Image = canvas.toDataURL("image/jpeg").replace(/^data:image\/(png|jpeg|jpg);base64,/, "")
   kirimKeRoboflow(true)
 }
@@ -83,7 +80,7 @@ captureButton.addEventListener("click", async function () {
   }
 
   if (webcam.readyState < 2) {
-    await new Promise((resolve) => setTimeout(resolve, 200))
+    await new Promise((r) => setTimeout(r, 200))
   }
 
   const canvas = document.createElement("canvas")
@@ -98,7 +95,6 @@ captureButton.addEventListener("click", async function () {
   webcam.style.display = "none"
 
   stopWebcam()
-
   isLive = false
   allowDetection = false
   resetHasil()
@@ -109,6 +105,7 @@ captureButton.addEventListener("click", async function () {
 
 exitWebcamButton.addEventListener("click", function () {
   stopWebcam()
+  allowDetection = false
   resetSemua()
 })
 
@@ -122,11 +119,12 @@ function stopWebcam() {
     detectionInterval = null
   }
   isLive = false
+  allowDetection = false
 }
 
 function resetSemua() {
   preview.src = ""
-  preview.style.display = "block"
+  preview.style.display = "none"
   webcam.style.display = "none"
 
   webcamButton.style.display = "inline-block"
@@ -142,6 +140,11 @@ function resetSemua() {
 function resetHasil() {
   result.innerHTML = ""
   printButton.style.display = "none"
+
+  const img = document.getElementById("printImage")
+  const detail = document.getElementById("printDetail")
+  if (img) img.src = ""
+  if (detail) detail.innerHTML = ""
 }
 
 function kirimKeRoboflow(fromLive = false) {
@@ -161,12 +164,9 @@ function kirimKeRoboflow(fromLive = false) {
     .then((res) => res.json())
     .then((data) => {
       if (!allowDetection && fromLive) return
-
       if (data.predictions && data.predictions.length > 0) {
-        const prediction = data.predictions[0]
-        const className = prediction.class
-        const confidence = (prediction.confidence * 100).toFixed(2)
-        tampilkanHasil(className, confidence)
+        const pred = data.predictions[0]
+        tampilkanHasil(pred.class, (pred.confidence * 100).toFixed(2))
       } else {
         result.innerHTML = "Tidak dapat mengenali jenis kelamin sapi."
         printButton.style.display = "none"
@@ -174,7 +174,7 @@ function kirimKeRoboflow(fromLive = false) {
     })
     .catch((err) => {
       console.error(err)
-      result.innerHTML = "Terjadi kesalahan saat mendeteksi."
+      result.innerHTML = "Terjadi kesalahan"
       printButton.style.display = "none"
     })
     .finally(() => {
@@ -186,10 +186,16 @@ function kirimKeRoboflow(fromLive = false) {
 }
 
 function tampilkanHasil(className, confidence) {
-  result.innerHTML = `Jenis kelamin: <strong>${className.toUpperCase()}</strong><br>
-                      Akurasi: ${confidence}%`
+  result.innerHTML = `Jenis kelamin: <strong>${className.toUpperCase()}</strong><br> Akurasi: ${confidence}%`
   if (!isLive) {
     printButton.style.display = "inline-block"
+
+    document.getElementById("printImage").src = preview.src
+    document.getElementById("printDetail").innerHTML = `
+      <strong>Jenis kelamin:</strong> ${className.toUpperCase()}<br>
+      <strong>Akurasi:</strong> ${confidence}%<br>
+      <strong>Tanggal:</strong> ${new Date().toLocaleString()}
+    `
   } else {
     printButton.style.display = "none"
   }
@@ -200,4 +206,9 @@ detectButton.addEventListener("click", function () {
     allowDetection = true
     kirimKeRoboflow(false)
   }
+})
+
+printButton.addEventListener("click", function () {
+  const modal = new bootstrap.Modal(document.getElementById("printModal"))
+  modal.show()
 })
